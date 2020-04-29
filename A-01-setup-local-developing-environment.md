@@ -306,6 +306,32 @@ CONTAINER ID        IMAGE                          COMMAND                  CREA
 [fli@192-168-1-4 share-get-data]$    
 ```
 
+* access `phpmyadmin` container from browser by user `root`
+
+![db-phpmyadmin-01](images/db-phpmyadmin-01.png)
+
+![db-phpmyadmin-02](images/db-phpmyadmin-02.png)
+
+## create `us-share-info` table in mariadb
+
+* create `us-share-info.sql`
+
+* import `us-share-info.sql` to mariadb
+
+```
+[fli@192-168-1-4 share-get-data]$ docker container ls
+CONTAINER ID        IMAGE                          COMMAND                  CREATED             STATUS              PORTS                    NAMES
+54531f113378        phpmyadmin/phpmyadmin:latest   "/docker-entrypoint.…"   About an hour ago   Up About an hour    0.0.0.0:8080->80/tcp     phpmyadmin
+5900c1075f7f        mariadb:latest                 "docker-entrypoint.s…"   About an hour ago   Up About an hour    0.0.0.0:3306->3306/tcp   mariadb
+[fli@192-168-1-4 share-get-data]$ 
+
+[fli@192-168-1-4 share-get-data]$ docker exec -i mariadb mysql -uroot -pchangeme mybb < us-share-info.sql
+[fli@192-168-1-4 share-get-data]$ 
+```
+
+![db-create-table-01](images/db-create-table-01.png)
+
+
 > reference [Yahoo API for python](https://github.com/ranaroussi/yfinance)     
 > reference [Reliably download historical market data from Yahoo! Finance with Python](https://aroussi.com/post/python-yahoo-finance)    
 > reference [Build minimum docker image](https://blog.realkinetic.com/building-minimal-docker-containers-for-python-applications-37d0272c52f3)    
