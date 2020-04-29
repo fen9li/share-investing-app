@@ -25,11 +25,16 @@ services:
     volumes:
       - mariadb_data:/var/lib/mysql
   
-  adminer:
-    image: adminer
-    container_name: adminer
-    restart: always
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
     networks:
       - backend
     ports:
-      - 8080:8080
+      - '8080:80'
+    volumes:
+      - /sessions
+    environment:
+      - PMA_HOST=mariadb
+    depends_on:
+      - mariadb

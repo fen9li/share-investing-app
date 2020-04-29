@@ -238,6 +238,73 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 
 ![db-adminer-05](images/db-adminer-05.png)
 
+## change `mariadb adminer` container to `phpmyadmin` container
+
+* update `docker-compose.yml`
+
+```
+[fli@192-168-1-4 share-get-data]$ cat docker-compose.yml 
+version: '3'
+
+volumes: 
+  mariadb_data:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: mybb
+      MYSQL_USER: mybb
+      MYSQL_PASSWORD: changeme
+    networks:
+      - backend
+    ports:
+      - '3306:3306'
+    volumes:
+      - mariadb_data:/var/lib/mysql
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    networks:
+      - backend
+    ports:
+      - '8080:80'
+    volumes:
+      - /sessions
+    environment:
+      - PMA_HOST=mariadb
+    depends_on:
+      - mariadb
+[fli@192-168-1-4 share-get-data]$  
+```
+
+> Note 1: map ports for `phpmyadmin - 8080:80` - this maps inner port `80` from inside the container, to port `8000` on docker host machine.    
+> Note 2: environment variable `PMA_ARBITRARY=1` can be set to add 'server' input field to phpmyadmin login page.
+
+* spin up containers
+
+```
+docker-compose up -d
+
+[fli@192-168-1-4 share-get-data]$ docker container ls
+CONTAINER ID        IMAGE                          COMMAND                  CREATED             STATUS              PORTS                    NAMES
+54531f113378        phpmyadmin/phpmyadmin:latest   "/docker-entrypoint.…"   3 minutes ago       Up 3 minutes        0.0.0.0:8080->80/tcp     phpmyadmin
+5900c1075f7f        mariadb:latest                 "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes        0.0.0.0:3306->3306/tcp   mariadb
+[fli@192-168-1-4 share-get-data]$  
+
+[fli@192-168-1-4 share-get-data]$ docker container inspect 590 --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+192.168.16.2
+[fli@192-168-1-4 share-get-data]$    
+```
 
 > reference [Yahoo API for python](https://github.com/ranaroussi/yfinance)     
 > reference [Reliably download historical market data from Yahoo! Finance with Python](https://aroussi.com/post/python-yahoo-finance)    
