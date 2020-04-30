@@ -9,22 +9,22 @@ networks:
     driver: bridge
 
 services:
-  mariadb:
-    image: mariadb:latest
-    container_name: mariadb
-    restart: always
+
+  get:
+    build: ./app
+    container_name: getdata
     environment:
-      MYSQL_ROOT_PASSWORD: changeme
-      MYSQL_DATABASE: mybb
-      MYSQL_USER: mybb
-      MYSQL_PASSWORD: changeme
+      DB_HOST: mariadb
+      DB_NAME: shares
+      DB_USER: fen9li
+      DB_PASS: changeme
+    volumes:
+      - ${PWD}/app:/app
     networks:
       - backend
-    ports:
-      - '3306:3306'
-    volumes:
-      - mariadb_data:/var/lib/mysql
-  
+    depends_on:
+      - mariadb
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: phpmyadmin
@@ -34,7 +34,25 @@ services:
       - '8080:80'
     volumes:
       - /sessions
+      - ${PWD}/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
     environment:
       - PMA_HOST=mariadb
     depends_on:
       - mariadb
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: shares
+      MYSQL_USER: fen9li
+      MYSQL_PASSWORD: changeme
+    networks:
+      - backend
+    ports:
+      - '3306:3306'
+    volumes:
+      - mariadb_data:/var/lib/mysql
+  

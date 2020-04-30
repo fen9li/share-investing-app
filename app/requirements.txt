@@ -1,0 +1,4 @@
+yfinance 
+lxml
+pymysql
+mysql-connector-python

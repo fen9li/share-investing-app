@@ -240,7 +240,51 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 
 ## change `mariadb adminer` container to `phpmyadmin` container
 
-* update `docker-compose.yml`
+* the default `phpmyadmin` configuration settings
+
+```
+[fli@192-168-1-4 share-get-data]$ docker container ls
+CONTAINER ID        IMAGE                          COMMAND                  CREATED             STATUS              PORTS                    NAMES
+33b15ce109f0        phpmyadmin/phpmyadmin:latest   "/docker-entrypoint.…"   10 minutes ago      Up 10 minutes       0.0.0.0:8080->80/tcp     phpmyadmin
+48400b0dd689        share-get-data_get             "sh -c 'sleep infini…"   10 minutes ago      Up 10 minutes                                getdata
+2efd730efca8        mariadb:latest                 "docker-entrypoint.s…"   10 minutes ago      Up 10 minutes       0.0.0.0:3306->3306/tcp   mariadb
+[fli@192-168-1-4 share-get-data]$ docker exec -it 33b bash
+root@33b15ce109f0:/var/www/html# cd /etc/phpmyadmin/
+root@33b15ce109f0:/etc/phpmyadmin# ls -l
+total 12
+-rw-r--r--. 1 root root 4642 Apr 18 16:15 config.inc.php
+-rw-r--r--. 1 root root   68 Apr 30 12:33 config.secret.inc.php
+-rw-r--r--. 1 root root    0 Apr 30 12:33 config.user.inc.php
+root@33b15ce109f0:/etc/phpmyadmin#
+
+root@33b15ce109f0:/etc/phpmyadmin# cat config.secret.inc.php 
+<?php
+$cfg['blowfish_secret'] = '%#9Q/>RVYqzTWw7VN_d9p8Jg).l{pDh_';
+root@33b15ce109f0:/etc/phpmyadmin# 
+
+root@33b15ce109f0:/etc/phpmyadmin# cat config.user.inc.php 
+root@33b15ce109f0:/etc/phpmyadmin# 
+```
+
+> Note: [Adding Custom Configuration to phpmyadmin](https://hub.docker.com/r/phpmyadmin/phpmyadmin/)
+
+You can add your own custom `config.inc.php` settings (such as Configuration Storage setup) by creating a file named `config.user.inc.php` with the various user defined settings in it, and then linking it into the container using:
+
+`-v /some/local/directory/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php`
+
+On the `docker run` line like this:
+
+`docker run --name myadmin -d --link mysql_db_server:db -p 8080:80 -v /some/local/directory/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php phpmyadmin/phpmyadmin`
+
+* create `config.user.inc.php` to enable row actions
+```
+[fli@192-168-1-4 share-get-data]$ cat phpmyadmin/config.user.inc.php 
+<?php
+$cfg['ActionLinksMode'] = 'both';
+[fli@192-168-1-4 share-get-data]$ 
+```
+
+* update `docker-compose.yml` to mount `phpmyadmin` to `/etc/phpmyadmin`
 
 ```
 [fli@192-168-1-4 share-get-data]$ cat docker-compose.yml 
@@ -255,22 +299,22 @@ networks:
     driver: bridge
 
 services:
-  mariadb:
-    image: mariadb:latest
-    container_name: mariadb
-    restart: always
+
+  get:
+    build: ./app
+    container_name: getdata
     environment:
-      MYSQL_ROOT_PASSWORD: changeme
-      MYSQL_DATABASE: mybb
-      MYSQL_USER: mybb
-      MYSQL_PASSWORD: changeme
+      DB_HOST: mariadb
+      DB_NAME: shares
+      DB_USER: fen9li
+      DB_PASS: changeme
+    volumes:
+      - ${PWD}/app:/app
     networks:
       - backend
-    ports:
-      - '3306:3306'
-    volumes:
-      - mariadb_data:/var/lib/mysql
-  
+    depends_on:
+      - mariadb
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: phpmyadmin
@@ -280,11 +324,28 @@ services:
       - '8080:80'
     volumes:
       - /sessions
+      - ${PWD}/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
     environment:
       - PMA_HOST=mariadb
     depends_on:
       - mariadb
-[fli@192-168-1-4 share-get-data]$  
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: shares
+      MYSQL_USER: fen9li
+      MYSQL_PASSWORD: changeme
+    networks:
+      - backend
+    ports:
+      - '3306:3306'
+    volumes:
+      - mariadb_data:/var/lib/mysql
+[fli@192-168-1-4 share-get-data]$      
 ```
 
 > Note 1: map ports for `phpmyadmin - 8080:80` - this maps inner port `80` from inside the container, to port `8000` on docker host machine.    
@@ -295,15 +356,27 @@ services:
 ```
 docker-compose up -d
 
+
 [fli@192-168-1-4 share-get-data]$ docker container ls
 CONTAINER ID        IMAGE                          COMMAND                  CREATED             STATUS              PORTS                    NAMES
-54531f113378        phpmyadmin/phpmyadmin:latest   "/docker-entrypoint.…"   3 minutes ago       Up 3 minutes        0.0.0.0:8080->80/tcp     phpmyadmin
-5900c1075f7f        mariadb:latest                 "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes        0.0.0.0:3306->3306/tcp   mariadb
-[fli@192-168-1-4 share-get-data]$  
+6df7518cf67b        phpmyadmin/phpmyadmin:latest   "/docker-entrypoint.…"   29 seconds ago      Up 25 seconds       0.0.0.0:8080->80/tcp     phpmyadmin
+3ad47e8647ec        share-get-data_get             "sh -c 'sleep infini…"   29 seconds ago      Up 26 seconds                                getdata
+547f64199b2d        mariadb:latest                 "docker-entrypoint.s…"   30 seconds ago      Up 28 seconds       0.0.0.0:3306->3306/tcp   mariadb
+[fli@192-168-1-4 share-get-data]$ docker volume ls
+DRIVER              VOLUME NAME
+local               0a326b229de917464f10fe71681c8b28594870840880fb47a2b1708d2fb87298
+local               share-get-data_mariadb_data
+[fli@192-168-1-4 share-get-data]$ docker network ls
+NETWORK ID          NAME                     DRIVER              SCOPE
+2ab7425f6078        bridge                   bridge              local
+3998d62e2b3f        host                     host                local
+7747599528aa        none                     null                local
+2c8a8fa93640        share-get-data_backend   bridge              local
+[fli@192-168-1-4 share-get-data]$ 
 
-[fli@192-168-1-4 share-get-data]$ docker container inspect 590 --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
-192.168.16.2
-[fli@192-168-1-4 share-get-data]$    
+[fli@192-168-1-4 share-get-data]$ docker container inspect 547 --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+192.168.144.2
+[fli@192-168-1-4 share-get-data]$     
 ```
 
 * access `phpmyadmin` container from browser by user `root`
@@ -314,23 +387,182 @@ CONTAINER ID        IMAGE                          COMMAND                  CREA
 
 ## create `us-share-info` table in mariadb
 
-* create `us-share-info.sql`
+* create/update `mariadb/shares.sql`
 
-* import `us-share-info.sql` to mariadb
+* import `mariadb/shares.sql` to mariadb
 
 ```
-[fli@192-168-1-4 share-get-data]$ docker container ls
-CONTAINER ID        IMAGE                          COMMAND                  CREATED             STATUS              PORTS                    NAMES
-54531f113378        phpmyadmin/phpmyadmin:latest   "/docker-entrypoint.…"   About an hour ago   Up About an hour    0.0.0.0:8080->80/tcp     phpmyadmin
-5900c1075f7f        mariadb:latest                 "docker-entrypoint.s…"   About an hour ago   Up About an hour    0.0.0.0:3306->3306/tcp   mariadb
-[fli@192-168-1-4 share-get-data]$ 
-
-[fli@192-168-1-4 share-get-data]$ docker exec -i mariadb mysql -uroot -pchangeme mybb < us-share-info.sql
+[fli@192-168-1-4 share-get-data]$ pwd
+/home/fli/share-get-data
+[fli@192-168-1-4 share-get-data]$ ls mariadb/
+shares.sql
+[fli@192-168-1-4 share-get-data]$ docker exec -i mariadb mysql -uroot -pchangeme shares < mariadb/shares.sql
 [fli@192-168-1-4 share-get-data]$ 
 ```
 
 ![db-create-table-01](images/db-create-table-01.png)
 
+![db-create-table-02](images/db-create-table-02.png)
+
+## create/update `app/get.py`
+```
+[fli@192-168-1-4 share-get-data]$ cat app/get.py 
+import yfinance as yf
+import os, json, time 
+import pymysql.cursors
+
+config = {
+  'host': os.environ['DB_HOST'],
+  'db': os.environ['DB_NAME'],
+  'user': os.environ['DB_USER'],
+  'password': os.environ['DB_PASS'],
+  'charset': 'utf8mb4',
+  'cursorclass': pymysql.cursors.DictCursor
+}
+
+connection = pymysql.connect(**config)
+
+try:
+  with connection.cursor() as cursor:
+    # Create a new record
+    sql = "INSERT INTO `us-share-info` (`symbol`, `sector`, `industry`, `longBusinessSummary`, `website`, `country`, `currency`, `fullTimeEmployees`, `forwardPE`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    cursor.execute(sql, ('MSFT', 'Technology', 'Software—Infrastructure', 'Microsoft Corporation develops, licenses, and supports software, services, devices, and solutions worldwide. Its Productivity and Business Processes segment offers Office, Exchange, SharePoint, Microsoft Teams, Office 365 Security and Compliance, and Skype for Business, as well as related Client Access Licenses (CAL); and Skype, Outlook.com, and OneDrive.', 'http://www.microsoft.com', 'United States', 'US', 144000, 27.746733 ))
+ 
+    # connection is not autocommit by default. So you must commit to save
+    # your changes.
+  connection.commit()
+ 
+  with connection.cursor() as cursor:
+    # Read a single record
+    sql = "SELECT `symbol`, `sector` FROM `us-share-info` WHERE `symbol`=%s"
+    cursor.execute(sql, ('MSFT',))
+    result = cursor.fetchone()
+    print(result)
+finally:
+  connection.close()
+
+msft = yf.Ticker("MSFT")
+stockinfo = msft.info
+
+while True:
+  time.sleep(1)
+[fli@192-168-1-4 share-get-data]$ 
+```
+
+
+## Appendix: Test connecting to mariadb container from inside `getdata` container
+
+```
+[fli@192-168-1-4 share-get-data]$ cat Dockerfile
+FROM python:3.8.2-slim
+
+COPY requirements.txt /
+RUN pip install -r /requirements.txt
+
+VOLUME /app
+WORKDIR /app
+
+CMD ["sh", "-c", "sleep infinity"]
+[fli@192-168-1-4 share-get-data]$ 
+
+[fli@192-168-1-4 share-get-data]$ docker images
+REPOSITORY              TAG                 IMAGE ID            CREATED             SIZE
+mariadb                 latest              b6184b68d1fd        5 days ago          357MB
+python                  3.8.2-slim          e8ad3533cb52        6 days ago          194MB
+phpmyadmin/phpmyadmin   latest              f257b784d16f        11 days ago         468MB
+[fli@192-168-1-4 share-get-data]$ 
+
+docker-compose up -d
+
+[fli@192-168-1-4 ~]$ docker container ls
+CONTAINER ID        IMAGE                          COMMAND                  CREATED             STATUS              PORTS                    NAMES
+6df7518cf67b        phpmyadmin/phpmyadmin:latest   "/docker-entrypoint.…"   12 minutes ago      Up 12 minutes       0.0.0.0:8080->80/tcp     phpmyadmin
+3ad47e8647ec        share-get-data_get             "sh -c 'sleep infini…"   12 minutes ago      Up 12 minutes                                getdata
+547f64199b2d        mariadb:latest                 "docker-entrypoint.s…"   12 minutes ago      Up 12 minutes       0.0.0.0:3306->3306/tcp   mariadb
+[fli@192-168-1-4 ~]$ 
+
+[fli@192-168-1-4 ~]$ docker container exec -it 3ad bash
+root@3ad47e8647ec:/app# ls -l
+total 12
+-rw-rw-r--. 1 1000 1000  148 Apr 30 13:45 Dockerfile
+-rw-rw-r--. 1 1000 1000 1564 Apr 30 13:44 get.py
+-rw-rw-r--. 1 1000 1000   45 Apr 30 07:32 requirements.txt
+root@3ad47e8647ec:/app# 
+
+root@3ad47e8647ec:/app# env
+HOSTNAME=3ad47e8647ec
+PYTHON_VERSION=3.8.2
+PWD=/app
+DB_USER=fen9li
+HOME=/root
+LANG=C.UTF-8
+GPG_KEY=E3FF2839C048B25C084DEBE9B26995E310250568
+TERM=xterm
+DB_HOST=mariadb
+SHLVL=1
+PYTHON_PIP_VERSION=20.0.2
+DB_NAME=shares
+PYTHON_GET_PIP_SHA256=421ac1d44c0cf9730a088e337867d974b91bdce4ea2636099275071878cc189e
+PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/d59197a3c169cef378a22428a3fa99d33e080a5d/get-pip.py
+PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+DB_PASS=changeme
+_=/usr/bin/env
+root@3ad47e8647ec:/app# 
+
+apt -y update
+apt -y install vim iputils-ping
+
+root@3ad47e8647ec:/app# ping -c4 ${DB_HOST}
+PING mariadb (192.168.144.2) 56(84) bytes of data.
+64 bytes from mariadb.share-get-data_backend (192.168.144.2): icmp_seq=1 ttl=64 time=0.199 ms
+64 bytes from mariadb.share-get-data_backend (192.168.144.2): icmp_seq=2 ttl=64 time=0.154 ms
+64 bytes from mariadb.share-get-data_backend (192.168.144.2): icmp_seq=3 ttl=64 time=0.197 ms
+64 bytes from mariadb.share-get-data_backend (192.168.144.2): icmp_seq=4 ttl=64 time=0.160 ms
+
+--- mariadb ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3ms
+rtt min/avg/max/mdev = 0.154/0.177/0.199/0.024 ms
+root@3ad47e8647ec:/app# 
+
+root@5f85d4728481:/app# vim get.py 
+root@3ad47e8647ec:/app# cat get.py 
+import yfinance as yf
+import os, json
+import pymysql.cursors
+
+config = {
+  'host': os.environ['DB_HOST'],
+  'db': os.environ['DB_NAME'],
+  'user': os.environ['DB_USER'],
+  'password': os.environ['DB_PASS'],
+  'charset': 'utf8mb4',
+  'cursorclass': pymysql.cursors.DictCursor
+}
+
+connection = pymysql.connect(**config)
+
+try:
+  with connection.cursor() as cursor:
+    # Create a new record
+    sql = "INSERT INTO `us-share-info` (`symbol`, `sector`, `industry`, `longBusinessSummary`, `website`, `country`, `currency`, `fullTimeEmployees`, `forwardPE`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    cursor.execute(sql, ('MSFT', 'Technology', 'Software—Infrastructure', 'Microsoft Corporation develops, licenses, and supports software, services, devices, and solutions worldwide. Its Productivity and Business Processes segment offers Office, Exchange, SharePoint, Microsoft Teams, Office 365 Security and Compliance, and Skype for Business, as well as related Client Access Licenses (CAL); and Skype, Outlook.com, and OneDrive.', 'http://www.microsoft.com', 'United States', 'US', 144000, 27.746733 ))
+ 
+    # connection is not autocommit by default. So you must commit to save your changes.
+  connection.commit()
+ 
+  with connection.cursor() as cursor:
+    # Read a single record
+    sql = "SELECT `symbol`, `sector` FROM `us-share-info` WHERE `symbol`=%s"
+    cursor.execute(sql, ('MSFT',))
+    result = cursor.fetchone()
+    print(result)
+finally:
+  connection.close()
+
+msft = yf.Ticker("MSFT")
+stockinfo = msft.info
+root@3ad47e8647ec:/app# 
+```
 
 > reference [Yahoo API for python](https://github.com/ranaroussi/yfinance)     
 > reference [Reliably download historical market data from Yahoo! Finance with Python](https://aroussi.com/post/python-yahoo-finance)    
