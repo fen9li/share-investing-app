@@ -11,7 +11,7 @@ networks:
 services:
 
   get:
-    build: ./app
+    build: ./get
     container_name: getdata
     environment:
       DB_HOST: mariadb
@@ -19,7 +19,7 @@ services:
       DB_USER: fen9li
       DB_PASS: changeme
     volumes:
-      - ${PWD}/app:/app
+      - ${PWD}/get:/app
     networks:
       - backend
     depends_on:

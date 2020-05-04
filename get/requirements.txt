@@ -1,0 +1,3 @@
+yahooquery
+pymysql
+mysql-connector-python

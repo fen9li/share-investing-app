@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# ignore all .bak and test.* files
+*.bak
+**/test.*
+
+

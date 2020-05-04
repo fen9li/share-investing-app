@@ -3,48 +3,38 @@
 ```
 docker run -it python:3.8 bash
 
-pip install yfinance lxml
+pip install yahooquery
 
-root@e6303538de1d:/# pip list
-Package         Version   
---------------- ----------
-certifi         2020.4.5.1
-chardet         3.0.4     
-idna            2.9       
-multitasking    0.0.9     
-numpy           1.18.3    
-pandas          1.0.3     
-pip             20.0.2    
-python-dateutil 2.8.1     
-pytz            2020.1    
-requests        2.23.0    
-setuptools      46.1.3    
-six             1.14.0    
-urllib3         1.25.9    
-wheel           0.34.2    
-yfinance        0.1.54    
-root@e6303538de1d:/# 
-
-apt -y install
+apt -y update
 apt -y install vim
 
-root@e6303538de1d:/# vim yahoo.py
-root@e6303538de1d:/# cat yahoo.py
-import yfinance as yf
+root@f1c67c1d477b:/# vim yahoo.py
+root@f1c67c1d477b:/# cat yahoo.py
+import yahooquery as yq 
 
-msft = yf.Ticker("MSFT")
+aapl = yq.Ticker('aapl')
 
-# get stock info
-print(msft.info)
+print(aapl.asset_profile)
+print(aapl.financial_data)
+print(aapl.summary_detail)
 
-# get historical market data
-hist = msft.history(period="5d")
+print(aapl.history('5d'))
 
-root@e6303538de1d:/# 
+root@f1c67c1d477b:/# 
 
-root@e6303538de1d:/# python yahoo.py 
-{'zip': '98052', 'sector': 'Technology', 'fullTimeEmployees': 144000, 'longBusinessSummary': 'Microsoft Corporation develops, licenses, and supports software, services, devices, and solutions worldwide. Its Productivity and Business Processes segment offers Office, Exchange, SharePoint, Microsoft Teams, Office 365 Security and Compliance, and Skype for Business, as well as related Client Access Licenses (CAL); and Skype, Outlook.com, and OneDrive. It also provides LinkedIn that includes Talent and marketing solutions, and subscriptions; and Dynamics 365, a set of cloud-based and on-premises business solutions for small and medium businesses, large organizations, and divisions of enterprises. Its Intelligent Cloud segment licenses SQL and Windows Servers, Visual Studio, System Center, and related CALs; GitHub that provides a collaboration platform and code hosting service for developers; and Azure, a cloud platform. It also provides support services and Microsoft consulting services to assist customers in developing, deploying, and managing Microsoft server and desktop solutions; and training and certification to developers and IT professionals on various Microsoft products. Its More Personal Computing segment offers Windows OEM licensing and other non-volume licensing of the Windows operating system; Windows Commercial, such as volume licensing of the Windows operating system, Windows cloud services, and other Windows commercial offerings; patent licensing; Windows Internet of Things; and MSN advertising. It also provides Microsoft Surface, PC accessories, and other intelligent devices; Gaming, including Xbox hardware, and Xbox software and services; video games and third-party video game royalties; and Search, including Bing and Microsoft advertising. It sells its products through distributors and resellers; and directly through digital marketplaces, online stores, and retail stores. It has strategic partnerships with Humana Inc., Nokia, Telkomsel, Swiss Re, and Kubota Corporation. The company was founded in 1975 and is headquartered in Redmond, Washington.', 'city': 'Redmond', 'phone': '425-882-8080', 'state': 'WA', 'country': 'United States', 'companyOfficers': [], 'website': 'http://www.microsoft.com', 'maxAge': 1, 'address1': 'One Microsoft Way', 'fax': '425-706-7329', 'industry': 'Software—Infrastructure', 'previousClose': 174.05, 'regularMarketOpen': 175.59, 'twoHundredDayAverage': 158.27147, 'trailingAnnualDividendYield': 0.011146222, 'payoutRatio': 0.32930002, 'volume24Hr': None, 'regularMarketDayHigh': 175.6672, 'navPrice': None, 'averageDailyVolume10Day': 37969233, 'totalAssets': None, 'regularMarketPreviousClose': 174.05, 'fiftyDayAverage': 158.39658, 'trailingAnnualDividendRate': 1.94, 'open': 175.59, 'toCurrency': None, 'averageVolume10days': 37969233, 'expireDate': None, 'yield': None, 'algorithm': None, 'dividendRate': 2.04, 'exDividendDate': 1589932800, 'beta': 0.962017, 'circulatingSupply': None, 'startDate': None, 'regularMarketDayLow': 169.39, 'priceHint': 2, 'currency': 'USD', 'trailingPE': 29.57847, 'regularMarketVolume': 34392694, 'lastMarket': None, 'maxSupply': None, 'openInterest': None, 'marketCap': 1291583356928, 'volumeAllCurrencies': None, 'strikePrice': None, 'averageVolume': 55443984, 'priceToSalesTrailing12Months': 9.620805, 'dayLow': 169.39, 'ask': 172.38, 'ytdReturn': None, 'askSize': 1200, 'volume': 34392694, 'fiftyTwoWeekHigh': 190.7, 'forwardPE': 27.746733, 'fromCurrency': None, 'fiveYearAvgDividendYield': 1.97, 'fiftyTwoWeekLow': 119.01, 'bid': 172.1, 'tradeable': False, 'dividendYield': 0.0117, 'bidSize': 1100, 'dayHigh': 175.6672, 'exchange': 'NMS', 'shortName': 'Microsoft Corporation', 'longName': 'Microsoft Corporation', 'exchangeTimezoneName': 'America/New_York', 'exchangeTimezoneShortName': 'EDT', 'isEsgPopulated': False, 'gmtOffSetMilliseconds': '-14400000', 'quoteType': 'EQUITY', 'symbol': 'MSFT', 'messageBoardId': 'finmb_21835', 'market': 'us_market', 'annualHoldingsTurnover': None, 'enterpriseToRevenue': 9.51, 'beta3Year': None, 'profitMargins': 0.33016, 'enterpriseToEbitda': 20.84, '52WeekChange': 0.33269525, 'morningStarRiskRating': None, 'forwardEps': 6.12, 'revenueQuarterlyGrowth': None, 'sharesOutstanding': 7606049792, 'fundInceptionDate': None, 'annualReportExpenseRatio': None, 'bookValue': 14.467, 'sharesShort': 53310482, 'sharesPercentSharesOut': 0.0069999998, 'fundFamily': None, 'lastFiscalYearEnd': 1561852800, 'heldPercentInstitutions': 0.74088997, 'netIncomeToCommon': 44323000320, 'trailingEps': 5.741, 'lastDividendValue': None, 'SandP52WeekChange': -0.022862852, 'priceToBook': 11.737748, 'heldPercentInsiders': 0.01421, 'nextFiscalYearEnd': 1625011200, 'mostRecentQuarter': 1577750400, 'shortRatio': 0.82, 'sharesShortPreviousMonthDate': 1584057600, 'floatShares': 7494998724, 'enterpriseValue': 1276748496896, 'threeYearAverageReturn': None, 'lastSplitDate': 1045526400, 'lastSplitFactor': '2:1', 'legalType': None, 'morningStarOverallRating': None, 'earningsQuarterlyGrowth': 0.383, 'dateShortInterest': 1586908800, 'pegRatio': 2.16, 'lastCapGain': None, 'shortPercentOfFloat': 0.0069999998, 'sharesShortPriorMonth': 55155176, 'category': None, 'fiveYearAverageReturn': None, 'regularMarketPrice': 175.59, 'logo_url': 'https://logo.clearbit.com/microsoft.com'}
-root@e6303538de1d:/# 
+root@f1c67c1d477b:/# python yahoo.py 
+{'aapl': {'address1': 'One Apple Park Way', 'city': 'Cupertino', 'state': 'CA', 'zip': '95014', 'country': 'United States', 'phone': '408-996-1010', 'website': 'http://www.apple.com', 'industry': 'Consumer Electronics', 'sector': 'Technology', 'longBusinessSummary': 'Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. It also sells various related services. The company offers iPhone, a line of smartphones; Mac, a line of personal computers; iPad, a line of multi-purpose tablets; and wearables, home, and accessories comprising AirPods, Apple TV, Apple Watch, Beats products, HomePod, iPod touch, and other Apple-branded and third-party accessories. It also provides digital content stores and streaming services; AppleCare support services; and iCloud, a cloud service, which stores music, photos, contacts, calendars, mail, documents, and others. In addition, the company offers various service, such as Apple Arcade, a game subscription service; Apple Card, a co-branded credit card; Apple News+, a subscription news and magazine service; and Apple Pay, a cashless payment service, as well as licenses its intellectual property, and provides other related services. The company serves consumers, and small and mid-sized businesses; and the education, enterprise, and government markets. It sells and delivers third-party applications for its products through the App Store, Mac App Store, and Watch App Store. The company also sells its products through its retail and online stores, and direct sales force; and third-party cellular network carriers, wholesalers, retailers, and resellers. Apple Inc. has a collaboration with Google to develop COVID-19 tracking system for Android and iOS devices. Apple Inc. was founded in 1977 and is headquartered in Cupertino, California.', 'fullTimeEmployees': 137000, 'companyOfficers': [{'maxAge': 1, 'name': 'Mr. Timothy D. Cook', 'age': 58, 'title': 'CEO & Director', 'yearBorn': 1961, 'fiscalYear': 2019, 'totalPay': 11555466, 'exercisedValue': 0, 'unexercisedValue': 0}, {'maxAge': 1, 'name': 'Mr. Luca  Maestri', 'age': 55, 'title': 'CFO & Sr. VP', 'yearBorn': 1964, 'fiscalYear': 2019, 'totalPay': 3576221, 'exercisedValue': 0, 'unexercisedValue': 0}, {'maxAge': 1, 'name': 'Mr. Jeffrey E. Williams', 'age': 55, 'title': 'Chief Operating Officer', 'yearBorn': 1964, 'fiscalYear': 2019, 'totalPay': 3574503, 'exercisedValue': 0, 'unexercisedValue': 0}, {'maxAge': 1, 'name': 'Ms. Katherine L. Adams', 'age': 55, 'title': 'Sr. VP, Gen. Counsel & Sec.', 'yearBorn': 1964, 'fiscalYear': 2019, 'totalPay': 3598384, 'exercisedValue': 0, 'unexercisedValue': 0}, {'maxAge': 1, 'name': "Ms. Deirdre  O'Brien", 'age': 52, 'title': 'Sr. VP of People & Retail', 'yearBorn': 1967, 'fiscalYear': 2019, 'totalPay': 2690253, 'exercisedValue': 0, 'unexercisedValue': 0}], 'auditRisk': 1, 'boardRisk': 1, 'compensationRisk': 3, 'shareHolderRightsRisk': 1, 'overallRisk': 1, 'governanceEpochDate': '2019-12-05 00:00:00', 'compensationAsOfEpochDate': '2019-12-31 00:00:00', 'maxAge': 86400}}
+{'aapl': {'maxAge': 86400, 'currentPrice': 289.07, 'targetHighPrice': 370.8, 'targetLowPrice': 207.77, 'targetMeanPrice': 308.91, 'targetMedianPrice': 315.0, 'recommendationMean': 2.0, 'recommendationKey': 'buy', 'numberOfAnalystOpinions': 37, 'totalCash': 94051000320, 'totalCashPerShare': 21.699, 'ebitda': 77305004032, 'totalDebt': 118760996864, 'quickRatio': 1.298, 'currentRatio': 1.496, 'totalRevenue': 267980996608, 'debtToEquity': 151.433, 'revenuePerShare': 60.097, 'returnOnAssets': 0.12377, 'returnOnEquity': 0.62094, 'grossProfits': 98392000000, 'freeCashflow': 45040123904, 'operatingCashflow': 75373002752, 'earningsGrowth': 0.037, 'revenueGrowth': 0.005, 'grossMargins': 0.3811, 'ebitdaMargins': 0.28847, 'operatingMargins': 0.24475999, 'profitMargins': 0.21350001, 'financialCurrency': 'USD'}}
+{'aapl': {'maxAge': 1, 'priceHint': 2, 'previousClose': 293.8, 'open': 286.25, 'dayLow': 285.85, 'dayHigh': 299.0, 'regularMarketPreviousClose': 293.8, 'regularMarketOpen': 286.25, 'regularMarketDayLow': 285.85, 'regularMarketDayHigh': 299.0, 'dividendRate': 3.28, 'dividendYield': 0.0113, 'exDividendDate': '2020-05-08 00:00:00', 'payoutRatio': 0.2408, 'fiveYearAvgDividendYield': 1.59, 'beta': 1.173542, 'trailingPE': 22.711346, 'forwardPE': 19.624577, 'volume': 60154175, 'regularMarketVolume': 60154175, 'averageVolume': 50937266, 'averageVolume10days': 38180283, 'averageDailyVolume10Day': 38180283, 'bid': 287.61, 'ask': 287.9, 'bidSize': 1200, 'askSize': 1400, 'marketCap': 1264820027392, 'fiftyTwoWeekLow': 170.27, 'fiftyTwoWeekHigh': 327.85, 'priceToSalesTrailing12Months': 4.7198124, 'fiftyDayAverage': 263.4409, 'twoHundredDayAverage': 279.22528, 'trailingAnnualDividendRate': 3.08, 'trailingAnnualDividendYield': 0.010483322, 'currency': 'USD', 'fromCurrency': None, 'toCurrency': None, 'lastMarket': None, 'algorithm': None, 'tradeable': False}}
+                       volume         low  ...       close    adjclose
+2020-04-27 13:30:00  29271900  279.950012  ...  283.170013  283.170013
+2020-04-28 13:30:00  28001200  278.200012  ...  278.579987  278.579987
+2020-04-29 13:30:00  34320200  283.890015  ...  287.730011  287.730011
+2020-04-30 13:30:00  45766000  288.350006  ...  293.799988  293.799988
+2020-05-01 13:30:00  60095200  285.850006  ...  289.070007  289.070007
+
+[5 rows x 6 columns]
+root@f1c67c1d477b:/#  
 ```
 
 ## build up mariadb container
@@ -385,7 +375,7 @@ NETWORK ID          NAME                     DRIVER              SCOPE
 
 ![db-phpmyadmin-02](images/db-phpmyadmin-02.png)
 
-## create `us-share-info` table in mariadb
+## create `ushare-info` table in mariadb
 
 * create/update `mariadb/shares.sql`
 
@@ -425,7 +415,7 @@ connection = pymysql.connect(**config)
 try:
   with connection.cursor() as cursor:
     # Create a new record
-    sql = "INSERT INTO `us-share-info` (`symbol`, `sector`, `industry`, `longBusinessSummary`, `website`, `country`, `currency`, `fullTimeEmployees`, `forwardPE`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    sql = "INSERT INTO `ushare-info` (`symbol`, `sector`, `industry`, `longBusinessSummary`, `website`, `country`, `currency`, `fullTimeEmployees`, `forwardPE`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
     cursor.execute(sql, ('MSFT', 'Technology', 'Software—Infrastructure', 'Microsoft Corporation develops, licenses, and supports software, services, devices, and solutions worldwide. Its Productivity and Business Processes segment offers Office, Exchange, SharePoint, Microsoft Teams, Office 365 Security and Compliance, and Skype for Business, as well as related Client Access Licenses (CAL); and Skype, Outlook.com, and OneDrive.', 'http://www.microsoft.com', 'United States', 'US', 144000, 27.746733 ))
  
     # connection is not autocommit by default. So you must commit to save
@@ -434,7 +424,7 @@ try:
  
   with connection.cursor() as cursor:
     # Read a single record
-    sql = "SELECT `symbol`, `sector` FROM `us-share-info` WHERE `symbol`=%s"
+    sql = "SELECT `symbol`, `sector` FROM `ushare-info` WHERE `symbol`=%s"
     cursor.execute(sql, ('MSFT',))
     result = cursor.fetchone()
     print(result)
@@ -449,8 +439,19 @@ while True:
 [fli@192-168-1-4 share-get-data]$ 
 ```
 
+## Process to build up from scratch
 
-## Appendix: Test connecting to mariadb container from inside `getdata` container
+```
+git clone -b develop git@github.com:fen9li/share-investing-app.git
+
+docker-compose up -d
+
+[fli@192-168-1-4 share-investing-app]$ mysql -h 127.0.0.1 -u root -p shares < mariadb/shares.sql 
+Enter password: changeme
+[fli@192-168-1-4 share-investing-app]$ 
+```
+
+## Appendix A: Test connecting to mariadb container from inside `getdata` container
 
 ```
 [fli@192-168-1-4 share-get-data]$ cat Dockerfile
@@ -544,7 +545,7 @@ connection = pymysql.connect(**config)
 try:
   with connection.cursor() as cursor:
     # Create a new record
-    sql = "INSERT INTO `us-share-info` (`symbol`, `sector`, `industry`, `longBusinessSummary`, `website`, `country`, `currency`, `fullTimeEmployees`, `forwardPE`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    sql = "INSERT INTO `ushare-info` (`symbol`, `sector`, `industry`, `longBusinessSummary`, `website`, `country`, `currency`, `fullTimeEmployees`, `forwardPE`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
     cursor.execute(sql, ('MSFT', 'Technology', 'Software—Infrastructure', 'Microsoft Corporation develops, licenses, and supports software, services, devices, and solutions worldwide. Its Productivity and Business Processes segment offers Office, Exchange, SharePoint, Microsoft Teams, Office 365 Security and Compliance, and Skype for Business, as well as related Client Access Licenses (CAL); and Skype, Outlook.com, and OneDrive.', 'http://www.microsoft.com', 'United States', 'US', 144000, 27.746733 ))
  
     # connection is not autocommit by default. So you must commit to save your changes.
@@ -552,7 +553,7 @@ try:
  
   with connection.cursor() as cursor:
     # Read a single record
-    sql = "SELECT `symbol`, `sector` FROM `us-share-info` WHERE `symbol`=%s"
+    sql = "SELECT `symbol`, `sector` FROM `ushare-info` WHERE `symbol`=%s"
     cursor.execute(sql, ('MSFT',))
     result = cursor.fetchone()
     print(result)
@@ -564,7 +565,45 @@ stockinfo = msft.info
 root@3ad47e8647ec:/app# 
 ```
 
-> reference [Yahoo API for python](https://github.com/ranaroussi/yfinance)     
-> reference [Reliably download historical market data from Yahoo! Finance with Python](https://aroussi.com/post/python-yahoo-finance)    
-> reference [Build minimum docker image](https://blog.realkinetic.com/building-minimal-docker-containers-for-python-applications-37d0272c52f3)    
+## Appendix B: command line to access mariadb 
+
+```
+[fli@192-168-1-4 ~]$ mysql -h 127.0.0.1 -u root -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 29
+Server version: 10.4.12-MariaDB-1:10.4.12+maria~bionic mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> use shares;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+MariaDB [shares]>
+
+MariaDB [shares]> select * from `ushare-prices` where date='2012-05-18';
++------+--------+------------+-------+-------+-------+-------+-----------+
+| Id   | symbol | date       | open  | close | high  | low   | volume    |
++------+--------+------------+-------+-------+-------+-------+-----------+
+|   71 | FB     | 2012-05-18 | 42.05 | 38.23 |    45 |    38 | 573576400 |
+| 8678 | MSFT   | 2012-05-18 | 29.79 | 29.27 | 29.81 | 29.17 |  56205300 |
++------+--------+------------+-------+-------+-------+-------+-----------+
+2 rows in set (0.01 sec)
+
+MariaDB [shares]> 
+
+MariaDB [shares]> exit
+Bye
+[fli@192-168-1-4 ~]$ 
+```
+
+> reference [Yahooquery](https://github.com/dpguthrie/yahooquer)
+
+~~reference [Yahoo API for python](https://github.com/ranaroussi/yfinance)~~    
+~~reference [Reliably download historical market data from Yahoo! Finance with Python](https://aroussi.com/post/python-yahoo-finance~~    
+~~reference [Build minimum docker image](https://blog.realkinetic.com/building-minimal-docker-containers-for-python-applications-37d0272c52f3)~~    
 
